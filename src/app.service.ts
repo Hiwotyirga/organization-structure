@@ -4,17 +4,17 @@ import { Repository } from 'typeorm';
 import { Position } from './Position.entity';
 import { CreatePositionDto } from './Entity/create-position.dto';
 import { UpdatePositionDto } from './Entity/update-position.dto';
-import { Employee } from './Employee.entity';
-import { CreateEmployeeDto } from './Entity/CreateEmployeeDto';
-import { UpdateEmployeeDto } from './Entity/UpdateEmployeeDto';
+// import { Employee } from './Employee.entity';
+// import { CreateEmployeeDto } from './Entity/CreateEmployeeDto';
+// import { UpdateEmployeeDto } from './Entity/UpdateEmployeeDto';
 
 @Injectable()
 export class AppService  {
   constructor(
     @InjectRepository(Position)
     private positionRepository: Repository<Position>,
-    @InjectRepository(Employee)
-    private employeeRepository: Repository<Employee>,
+    // @InjectRepository(Employee)
+    // private employeeRepository: Repository<Employee>,
     
   ) {}
 
@@ -62,6 +62,7 @@ export class AppService  {
     return position.subordinates;
   }
   async getHierarchy(): Promise<Position[]> {
+    // Fetch the CEO position assuming its ID is 1
     const ceo = await this.positionRepository.findOne({
       where: { id: 1 },
       relations: ['subordinates', 'reportingTo'],
@@ -71,9 +72,9 @@ export class AppService  {
     }
     return [this.buildHierarchy(ceo)];
   }
-
+  
   private buildHierarchy(position: Position): Position {
-    const hierarchy = { ...position, subordinates: [] };
+    const hierarchy: Position = { ...position, subordinates: [] };
     if (position.subordinates && position.subordinates.length > 0) {
       hierarchy.subordinates = position.subordinates.map(subordinate => this.buildHierarchy(subordinate));
     }

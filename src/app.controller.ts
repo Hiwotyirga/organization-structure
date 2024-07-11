@@ -7,8 +7,8 @@ import { Position } from './Position.entity';
 // import { appService } from './app.service';
 import { AppService } from './app.service';
 import { Employee } from './Employee.entity';
-import { CreateEmployeeDto } from './Entity/CreateEmployeeDto';
-import { UpdateEmployeeDto } from './Entity/UpdateEmployeeDto';
+// import { CreateEmployeeDto } from './Entity/CreateEmployeeDto';
+// import { UpdateEmployeeDto } from './Entity/UpdateEmployeeDto';
 
 @Controller('positions')
 export class AppController {
@@ -38,14 +38,16 @@ export class AppController {
   remove(@Param('id') id: number): Promise<void> {
     return this.appService.remove(id);
   }
+  @Get('hierarchy')
+  asyncgetHierarchy():Promise<Position[]>{
+    return this.appService.getHierarchy()
+  }
 
   @Get(':id/children')
   getChildren(@Param('id') id: number): Promise<Position[]> {
     return this.appService.getChildren(id);
   }
-  @Get('hierarchy')
-  async getHierarchy(): Promise<Position[]> {
-    return this.appService.getHierarchy();
-  }
+
+
   
 }
