@@ -18,7 +18,7 @@ import { Employee } from './Employee.entity';
       entities: [Employee, Position],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([Position,Employee]),
+    TypeOrmModule.forFeature([Position, Employee]),
   ],
   controllers: [AppController],
   providers: [AppService],

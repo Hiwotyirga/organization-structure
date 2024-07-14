@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Employee } from './Employee.entity';
 
 @Entity('positions')
@@ -12,7 +19,13 @@ export class Position {
   @Column()
   description: string;
 
-  @ManyToOne(() => Position, (position) => position.subordinates, { nullable: true })
+  @Column({ nullable: true })
+  reportingToId: number;
+
+  @ManyToOne(() => Position, (position) => position.subordinates, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'reportingToId' })
   reportingTo: Position;
 
   @OneToMany(() => Position, (position) => position.reportingTo)
