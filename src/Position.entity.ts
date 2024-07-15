@@ -6,7 +6,6 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Employee } from './Employee.entity';
 
 @Entity('positions')
 export class Position {
@@ -30,7 +29,4 @@ export class Position {
 
   @OneToMany(() => Position, (position) => position.reportingTo)
   subordinates: Position[];
-
-  @OneToMany(() => Employee, (employee) => employee.position)
-  employees: Employee[];
 }

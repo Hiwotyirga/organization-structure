@@ -1,15 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-
-export class ReportingToDto {
-  @IsNumber()
-  id: number;
-}
+import { IsString, IsNumber,IsOptional } from "class-validator";
 
 export class UpdatePositionDto {
   @IsString()
@@ -19,7 +8,6 @@ export class UpdatePositionDto {
   description: string;
 
   @IsOptional()
-  @ValidateNested()
-  @Type(() => ReportingToDto)
-  reportingTo: ReportingToDto;
+  @IsNumber()
+  reportingToId: number;
 }

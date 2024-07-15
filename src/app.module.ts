@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Position } from './Position.entity';
-import { Employee } from './Employee.entity';
+// import { Employee } from './Employee.entity';
 // import { EmployeeController } from './EmployeeController';
 
 @Module({
@@ -15,10 +15,10 @@ import { Employee } from './Employee.entity';
       username: 'root',
       password: 'selam',
       database: 'hierarchy',
-      entities: [Employee, Position],
+      entities: [Position],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([Position, Employee]),
+    TypeOrmModule.forFeature([Position]),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Position } from './Position.entity';
+import { Position } from './position.entity';
 import { CreatePositionDto } from './Entity/create-position.dto';
 import { UpdatePositionDto } from './Entity/update-position.dto';
 
@@ -10,8 +10,6 @@ export class AppService {
   constructor(
     @InjectRepository(Position)
     private positionRepository: Repository<Position>,
-    // @InjectRepository(Employee)
-    // private employeeRepository: Repository<Employee>,
   ) {}
 
   async create(createPositionDto: CreatePositionDto): Promise<Position> {
@@ -22,23 +20,61 @@ export class AppService {
       const reportingTo = await this.positionRepository.findOne({
         where: { id: reportingToId },
       });
-
       if (!reportingTo) {
         throw new NotFoundException(
           `Position with ID ${reportingToId} not found`,
         );
       }
-
       position.reportingTo = reportingTo;
     }
 
     return this.positionRepository.save(position);
   }
+  // async getHierarchy(): Promise<Position[]> {
+  //   const allPositions = await this.positionRepository.find({
+  //     relations: ['subordinates', 'reportingTo'],
+  //   });
+  //   return allPositions;
+  // }
 
-  async findAll(): Promise<Position[]> {
+  //  async findAllPosition(): Promise<Position[]> {
+  //   return  this.positionRepository.find({
+  //     relations: ['subordinates', 'reportingTo'],
+  //   })
+
+  async findAllPosition(): Promise<Position[]> {
     return this.positionRepository.find({
       relations: ['subordinates', 'reportingTo'],
     });
+  }
+
+  async findAll(): Promise<Position[]> {
+    const allPositions = await this.positionRepository.find({
+      relations: ['subordinates', 'reportingTo'],
+    });
+
+    const rootPositions = allPositions.filter(
+      (position) => position.reportingToId === null,
+    );
+    return rootPositions.map((rootPosition) =>
+      this.buildHierarchy(rootPosition, allPositions),
+    );
+  }
+
+  private buildHierarchy(position: Position, allPositions: Position[]): any {
+    const children = allPositions.filter(
+      (child) => child.reportingToId === position.id,
+    );
+
+    return {
+      id: position.id,
+      name: position.name,
+      description: position.description,
+      reportingToId: position.reportingToId,
+      children: children.map((child) =>
+        this.buildHierarchy(child, allPositions),
+      ),
+    };
   }
 
   async findOne(id: number): Promise<Position> {
@@ -52,18 +88,26 @@ export class AppService {
     return position;
   }
 
-  async update(
-    id: number,
-    updatePositionDto: UpdatePositionDto,
-  ): Promise<Position> {
-    const position = await this.findOne(id);
+  // AppService update method
+  async update(id: number, updatePositionDto: UpdatePositionDto): Promise<Position> {
+    const position = await this.positionRepository.findOne({where:{id}});
+  
+    if (!position) {
+      throw new NotFoundException(`Position with ID ${id} not found`);
+    }
+  
     position.name = updatePositionDto.name;
     position.description = updatePositionDto.description;
-    position.reportingTo = updatePositionDto.reportingTo
-      ? await this.findOne(updatePositionDto.reportingTo.id)
-      : null;
+  
+    if (updatePositionDto.reportingToId) {
+      position.reportingToId = updatePositionDto.reportingToId;
+    } else {
+      position.reportingToId = null; // Clear reportingToId if not provided in updatePositionDto
+    }
+  
     return this.positionRepository.save(position);
   }
+
 
   async remove(id: number): Promise<void> {
     const position = await this.findOne(id);
@@ -72,49 +116,17 @@ export class AppService {
     }
     await this.positionRepository.remove(position);
   }
+
   async getChildren(id: number): Promise<Position[]> {
     const position = await this.findOne(id);
     return position.subordinates;
   }
-  async getPositionHierarchy(rootPositionId: number): Promise<any> {
-    const rootPosition = await this.positionRepository.findOne({
-      where: { id: rootPositionId },
-      relations: this.getNestedRelations(),
-    });
 
-    if (!rootPosition) {
-      throw new NotFoundException(
-        `Position with ID ${rootPositionId} not found`,
-      );
-    }
+  //   async getCompleteHierarchy(): Promise<Position[]> {
+  //     const allPositions = await this.positionRepository.find({
+  //       relations: ['subordinates', 'reportingTo'],
+  //     });
 
-    return this.buildPositionHierarchy(rootPosition);
-  }
-
-  private getNestedRelations(): string[] {
-    const relations = ['subordinates'];
-    const maxDepth = 5;
-    for (let i = 0; i < maxDepth; i++) {
-      relations.push(...relations.map((rel) => `${rel}.subordinates`));
-    }
-    return relations;
-  }
-
-  private buildPositionHierarchy(position: Position): any {
-    const positionData = {
-      id: position.id,
-      name: position.name,
-      description: position.description,
-      reportingToId: position.reportingToId,
-      children: [],
-    };
-
-    if (position.subordinates && position.subordinates.length > 0) {
-      for (const subordinate of position.subordinates) {
-        positionData.children.push(this.buildPositionHierarchy(subordinate));
-      }
-    }
-
-    return positionData;
-  }
+  //     return allPositions;
+  // }
 }

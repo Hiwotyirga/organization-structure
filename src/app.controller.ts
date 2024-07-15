@@ -11,10 +11,8 @@ import {
 import { CreatePositionDto } from './Entity/create-position.dto';
 import { UpdatePositionDto } from './Entity/update-position.dto';
 import { Position } from './Position.entity';
-// import { PositionService } from './positionService';
-// import { appService } from './app.service';
+
 import { AppService } from './app.service';
-import { Employee } from './Employee.entity';
 
 @Controller('positions')
 export class AppController {
@@ -24,14 +22,22 @@ export class AppController {
   async create(
     @Body() createPositionDto: CreatePositionDto,
   ): Promise<Position> {
-    const createposition = await this.appService.create(createPositionDto);
-
-    return createposition;
+    const createdPosition = await this.appService.create(createPositionDto);
+    return createdPosition;
   }
+
+  // @Get('hierarchy')
+  // async getHierarchy(): Promise<Position[]> {
+  //   return this.appService.getHierarchy();
+  // }
 
   @Get()
   async findAll(): Promise<Position[]> {
     return this.appService.findAll();
+  }
+  @Get('all')
+  async findAllPosion(): Promise<Position[]> {
+    return this.appService.findAllPosition();
   }
 
   @Get(':id')
@@ -40,13 +46,14 @@ export class AppController {
     return findone;
   }
 
+  // AppController update method
   @Patch(':id')
   async update(
     @Param('id') id: number,
     @Body() updatePositionDto: UpdatePositionDto,
   ): Promise<Position> {
-    const patch = await this.appService.update(id, updatePositionDto);
-    return patch;
+    const updatedPosition = await this.appService.update(id, updatePositionDto);
+    return updatedPosition;
   }
 
   @Delete(':id')
@@ -54,11 +61,11 @@ export class AppController {
     const removePosition = await this.appService.remove(id);
     return removePosition;
   }
-  @Get('hierarchy/:id')
-  async getPositionHierarchy(@Param('id') id: number): Promise<any> {
-    const positionHierarchy = await this.appService.getPositionHierarchy(id);
-    return positionHierarchy;
-  }
+  // }
+  // @Get('hierarchy')
+  // async getHierarchy():Promise<Position[]>{
+  //   return this.appService.getCompleteHierarchy()
+  // }
 
   @Get(':id/children')
   getChildren(@Param('id') id: number): Promise<Position[]> {
