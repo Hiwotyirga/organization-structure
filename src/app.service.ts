@@ -109,11 +109,26 @@ export class AppService {
   }
 
 
-  async remove(id: number): Promise<void> {
-    const position = await this.findOne(id);
+  // async remove(id: number): Promise<void> {
+  //   const position = await this.findOne(id);
+  //   if (!position) {
+  //     throw new NotFoundException(`Position with ID ${id} not found`);
+  //   }
+  //   await this.positionRepository.remove(position);
+  // }
+  async removePosition(id: number): Promise<void> {
+    const position = await this.positionRepository.findOne({where:{id}});
     if (!position) {
       throw new NotFoundException(`Position with ID ${id} not found`);
     }
+    
+    // Remove position from its parent's subordinates
+    const parent = position.reportingTo;
+    if (parent) {
+      parent.subordinates = parent.subordinates.filter(sub => sub.id !== id);
+      await this.positionRepository.save(parent);
+    }
+
     await this.positionRepository.remove(position);
   }
 

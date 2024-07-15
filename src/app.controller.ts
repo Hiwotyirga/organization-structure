@@ -56,10 +56,14 @@ export class AppController {
     return updatedPosition;
   }
 
+  // @Delete(':id')
+  // async remove(@Param('id') id: number): Promise<void> {
+  //   const removePosition = await this.appService.remove(id);
+  //   return removePosition;
+  // }
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<void> {
-    const removePosition = await this.appService.remove(id);
-    return removePosition;
+  async removePosition(@Param('id') id: number): Promise<void> {
+    await this.appService.removePosition(id);
   }
   // }
   // @Get('hierarchy')
