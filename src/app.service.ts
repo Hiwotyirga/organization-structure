@@ -19,16 +19,22 @@ export class AppService {
     const position = this.positionRepository.create(otherData);
 
     if (reportingToId) {
-      const reportingTo = await this.positionRepository.findOne({ where: { id: reportingToId } });
+      const reportingTo = await this.positionRepository.findOne({
+        where: { id: reportingToId },
+      });
+
       if (!reportingTo) {
-        throw new NotFoundException(`Position with ID ${reportingToId} not found`);
+        throw new NotFoundException(
+          `Position with ID ${reportingToId} not found`,
+        );
       }
+
       position.reportingTo = reportingTo;
     }
 
     return this.positionRepository.save(position);
   }
-  
+
   async findAll(): Promise<Position[]> {
     return this.positionRepository.find({
       relations: ['subordinates', 'reportingTo'],
@@ -77,7 +83,9 @@ export class AppService {
     });
 
     if (!rootPosition) {
-      throw new NotFoundException(`Position with ID ${rootPositionId} not found`);
+      throw new NotFoundException(
+        `Position with ID ${rootPositionId} not found`,
+      );
     }
 
     return this.buildPositionHierarchy(rootPosition);
@@ -85,9 +93,9 @@ export class AppService {
 
   private getNestedRelations(): string[] {
     const relations = ['subordinates'];
-    const maxDepth = 5; 
+    const maxDepth = 5;
     for (let i = 0; i < maxDepth; i++) {
-      relations.push(...relations.map(rel => `${rel}.subordinates`));
+      relations.push(...relations.map((rel) => `${rel}.subordinates`));
     }
     return relations;
   }
@@ -109,5 +117,4 @@ export class AppService {
 
     return positionData;
   }
-  
 }

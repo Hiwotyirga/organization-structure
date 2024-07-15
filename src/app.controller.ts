@@ -16,37 +16,43 @@ import { Position } from './Position.entity';
 import { AppService } from './app.service';
 import { Employee } from './Employee.entity';
 
-
 @Controller('positions')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post()
-  create(@Body() createPositionDto: CreatePositionDto): Promise<Position> {
-    return this.appService.create(createPositionDto);
+  async create(
+    @Body() createPositionDto: CreatePositionDto,
+  ): Promise<Position> {
+    const createposition = await this.appService.create(createPositionDto);
+
+    return createposition;
   }
 
   @Get()
-  findAll(): Promise<Position[]> {
+  async findAll(): Promise<Position[]> {
     return this.appService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Position> {
-    return this.appService.findOne(id);
+  async findOne(@Param('id') id: number): Promise<Position> {
+    const findone = await this.appService.findOne(id);
+    return findone;
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: number,
     @Body() updatePositionDto: UpdatePositionDto,
   ): Promise<Position> {
-    return this.appService.update(id, updatePositionDto);
+    const patch = await this.appService.update(id, updatePositionDto);
+    return patch;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
-    return this.appService.remove(id);
+  async remove(@Param('id') id: number): Promise<void> {
+    const removePosition = await this.appService.remove(id);
+    return removePosition;
   }
   @Get('hierarchy/:id')
   async getPositionHierarchy(@Param('id') id: number): Promise<any> {
